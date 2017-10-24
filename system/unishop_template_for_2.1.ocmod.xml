@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+<name>UniShop template for 2.1</name>
+<code>UniShop template for 2.1</code>
+<version>1.0</version>
+<author>support@unishop2.ru</author>
+	<file path="admin/controller/extension/module.php">
+		<operation>
+			<search><![CDATA[$files = glob(DIR_APPLICATION . 'controller/module/*.php');]]></search>
+			<add position="after" error="skip"><![CDATA[
+			//Для совместимости с 2.1
+			$uni_modules = glob(DIR_APPLICATION . 'controller/extension/module/*.php', GLOB_BRACE);
+		
+			foreach ($uni_modules as $uni_module) {
+				if (in_array(DIR_APPLICATION.'controller/module/'.basename($uni_module), $files)) {
+					unlink(DIR_APPLICATION.'controller/module/'.basename($uni_module));
+					unset($files[array_search(DIR_APPLICATION.'controller/module/'.basename($uni_module), $files)]);
+				}
+				$files[] = $uni_module;
+			}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$this->load->language('module/' . $extension);]]></search>
+			<add position="after" error="skip"><![CDATA[
+			$this->load->language('extension/module/' . $extension);
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[if (!file_exists(DIR_APPLICATION . 'controller/module/' . $value . '.php')) {]]></search>
+			<add position="replace" error="skip"><![CDATA[
+			//Для совместимости с 2.1
+			if (!file_exists(DIR_APPLICATION.'controller/module/'.$value.'.php') && !file_exists(DIR_APPLICATION.'controller/extension/module/'.$value.'.php')) {]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$this->load->controller('module/']]></search>
+			<add position="replace" error="skip"><![CDATA[
+			//Для совместимости с 2.1
+			$files = glob(DIR_APPLICATION . 'controller/module/*.php');
+			$this->load->controller(in_array(DIR_APPLICATION.'controller/module/'.$this->request->get['extension'], $files) ? 'module/'.$this->request->get['extension'] : 'extension/module/']]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$this->url->link('module/']]></search>
+			<add position="replace" error="skip"><![CDATA[$this->url->link(in_array(DIR_APPLICATION.'controller/module/'.basename($extension).'.php', $files) ? 'module/'.$extension : 'extension/module/']]></add>
+		</operation>
+	</file>
+	<file path="admin/controller/design/layout.php">
+	<operation>
+			<search><![CDATA[$this->load->language('module/' . $code);]]></search>
+			<add position="after" error="skip"><![CDATA[
+			//Для совместимости с 2.1
+			$this->load->language('extension/module/' . $code);
+			]]></add>
+		</operation>
+	</file>
+	<file path="catalog/controller/common/{column_left,content_bottom}*.php">
+		<operation>
+			<search><![CDATA[$layout_id = 0;]]></search>
+			<add position="after" error="skip"><![CDATA[
+			$data['route'] = (isset($this->request->get['route']) ? $this->request->get['route'] : '');
+			]]></add>
+		</operation>
+	</file>
+	<file path="catalog/controller/common/{column_left,column_right,content_top,content_bottom}*.php">
+		<operation>
+			<search><![CDATA[$data['modules'] = array();]]></search>
+			<add position="before" error="skip"><![CDATA[
+			//Для совместимости с 2.1
+			$uni_modules = glob(DIR_APPLICATION . 'controller/extension/module/*.php', GLOB_BRACE);	
+			
+			$ext = array();
+			foreach ($uni_modules as $uni_module) {
+				$ext[] = basename($uni_module, '.php');
+			}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$data['modules'][] = $this->load->controller('module/' . $part[0]);]]></search>
+			<add position="replace" error="skip"><![CDATA[$data['modules'][] = in_array($part[0], $ext) ? $this->load->controller('extension/module/' . $part[0]) : $this->load->controller('module/' . $part[0]);]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$data['modules'][] = $this->load->controller('module/' . $part[0], $setting_info);]]></search>
+			<add position="replace" error="skip"><![CDATA[$data['modules'][] = in_array($part[0], $ext) ? $this->load->controller('extension/module/' . $part[0], $setting_info) : $this->load->controller('module/' . $part[0], $setting_info);]]></add>
+		</operation>
+	</file>
+</modification>

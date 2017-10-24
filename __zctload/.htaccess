@@ -1,0 +1,20 @@
+<Files .svn>
+ Deny from all
+</Files>
+<Files .git>
+ Deny from all
+</Files>
+<Files .git*>
+ Deny from all
+</Files>
+<Files tiny>
+ Deny from all
+</Files>
+
+RewriteEngine On
+RewriteBase /admin/zctload/
+RewriteCond %{REQUEST_FILENAME} !^favicon\.ico
+RewriteCond %{REQUEST_FILENAME} !^robots\.txt
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?$1 [L,QSA]

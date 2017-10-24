@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+<name>UniShop template (admin side)</name>
+<code>UniShop template (admin side)</code>
+<version>2.1</version>
+<author>support@unishop2.ru</author>
+	<file path="admin/controller/common/menu.php">
+		<operation>
+			<search><![CDATA[$data['affiliate']]]></search>
+			<add position="before" error="skip"><![CDATA[
+			$data['text_news'] = $this->language->get('text_news');
+			$data['text_news_all'] = $this->language->get('text_news_all');
+			$data['text_news_add'] = $this->language->get('text_news_add');
+			
+			$data['news'] = $this->url->link('extension/module/news/listing', 'token=' . $this->session->data['token'], 'SSL');
+			$data['news_add'] = $this->url->link('extension/module/news/insert', 'token=' . $this->session->data['token'], 'SSL');
+			]]></add>
+		</operation>
+	</file>
+	<file path="admin/view/template/common/menu.tpl">
+		<operation>
+			<search><![CDATA[<?php echo $text_information; ?></a></li>]]></search>
+			<add position="after" error="skip"><![CDATA[
+			<li id="news">
+				<a class="top"><?php echo $text_news; ?></a>
+				<ul>
+					<li><a href="<?php echo $news; ?>"><?php echo $text_news_all; ?></a></li>
+					<li><a href="<?php echo $news_add; ?>"><?php echo $text_news_add; ?></a></li>
+				</ul>
+			</li>
+			]]></add>
+		</operation>
+	</file>
+	<file path="admin/controller/common/column_left.php">
+		<operation>
+			<search><![CDATA[$catalog = array();]]></search>
+			<add position="before" error="skip"><![CDATA[
+			$unishop = array();
+			
+			if ($this->user->hasPermission('access', 'extension/module/unishop_settings')) {		
+				$unishop[] = array(
+					'name'	   => $this->language->get('text_unishop_settings'),
+					'href'     => $this->url->link('extension/module/unishop_settings', 'token=' . $this->session->data['token'], true),
+					'children' => array()		
+				);					
+			}
+			
+			if ($this->user->hasPermission('access', 'extension/module/unishop_update')) {		
+				$unishop[] = array(
+					'name'	   => $this->language->get('text_unishop_update'),
+					'href'     => $this->url->link('extension/module/unishop_update', 'token=' . $this->session->data['token'], true),
+					'children' => array()		
+				);					
+			}
+			
+			if ($unishop) {
+				$data['menus'][] = array(
+					'id'       => 'menu-unishop',
+					'icon'	   => 'fa-cogs', 
+					'name'	   => $this->language->get('text_unishop'),
+					'href'     => '',
+					'children' => $unishop
+				);		
+			}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[if ($catalog) {]]></search>
+			<add position="before" error="skip"><![CDATA[
+			if ($this->user->hasPermission('access', 'extension/module/news')) {		
+				$catalog[] = array(
+					'name'	   => $this->language->get('text_news'),
+					'href'     => $this->url->link('extension/module/news/listing', 'token='.$this->session->data['token'], true),
+					'children' => array()		
+				);					
+			}
+			]]></add>
+		</operation>
+	</file>
+	
+	<file path="admin/language/{en-gb,english}/{en-gb,english}.php">
+		<operation>
+			<search><![CDATA[// Error]]></search>
+			<add position="before" error="skip"><![CDATA[
+			$_['text_unishop'] = 'UniShop';
+			$_['text_unishop_settings'] = 'Настройки шаблона';
+			$_['text_unishop_update'] = 'Управление обновлениями';
+			$_['text_news'] = 'Новости';
+			$_['text_news_all'] = 'Все новости';
+			$_['text_news_add'] = 'Добавить новость';
+			]]></add>
+		</operation>
+	</file>
+	
+	<file path="admin/language/{ru-ru,russian}/{ru-ru,russian}.php">
+		<operation>
+			<search><![CDATA[// Error]]></search>
+			<add position="before" error="skip"><![CDATA[
+			$_['text_unishop'] = 'UniShop';
+			$_['text_unishop_settings'] = 'Настройки шаблона';
+			$_['text_unishop_update'] = 'Управление обновлениями';
+			$_['text_news'] = 'Новости';
+			$_['text_news_all'] = 'Все новости';
+			$_['text_news_add'] = 'Добавить новость';
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="admin/model/catalog/review.php">
+		<operation>
+			<search><![CDATA[public function addReview($data) {]]></search>
+			<add position="before"><![CDATA[
+			public function checkAdminReply() {
+				$plus = $this->db->query("show columns FROM ".DB_PREFIX."review WHERE Field = 'plus'");
+				
+				if (!$plus->num_rows) { 
+					$this->db->query("ALTER TABLE `".DB_PREFIX."review` ADD `plus` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `text`");
+				} 
+				
+				$minus = $this->db->query("show columns FROM ".DB_PREFIX."review WHERE Field = 'minus'");
+				if (!$minus->num_rows) { 
+					$this->db->query("ALTER TABLE `".DB_PREFIX."review` ADD `minus` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `text`");
+				} 
+				
+				$admin_reply = $this->db->query("show columns FROM ".DB_PREFIX."review WHERE Field = 'admin_reply'");
+				if (!$admin_reply->num_rows) { 
+					$this->db->query("ALTER TABLE `".DB_PREFIX."review` ADD `admin_reply` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `text`");
+				}
+			}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[, rating =]]></search>
+			<add position="replace"><![CDATA[, plus = '".$this->db->escape(strip_tags($data['plus']))."', minus = '".$this->db->escape(strip_tags($data['minus']))."', admin_reply = '".$this->db->escape(strip_tags($data['admin_reply']))."', rating =]]></add>
+		</operation>
+	</file>
+	<file path="admin/controller/catalog/review.php">
+		<operation>
+			<search><![CDATA[$this->getList();]]></search>
+			<add position="before"><![CDATA[
+			$this->model_catalog_review->checkAdminReply();
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$data['entry_text'] = $this->language->get('entry_text');]]></search>
+			<add position="after"><![CDATA[
+			$data['entry_plus'] = $this->language->get('entry_plus');
+			$data['entry_minus'] = $this->language->get('entry_minus');
+			$data['entry_admin_reply'] = $this->language->get('entry_admin_reply');
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[if (isset($this->request->post['rating'])) {]]>
+			</search>
+			<add position="before"><![CDATA[
+			if (isset($this->request->post['plus'])) {
+				$data['plus'] = $this->request->post['plus'];
+			} elseif (!empty($review_info)) {
+				$data['plus'] = $review_info['plus'];
+			} else {
+				$data['plus'] = '';
+			}
+			if (isset($this->request->post['minus'])) {
+				$data['minus'] = $this->request->post['minus'];
+			} elseif (!empty($review_info)) {
+				$data['minus'] = $review_info['minus'];
+			} else {
+				$data['minus'] = '';
+			}
+			if (isset($this->request->post['admin_reply'])) {
+				$data['admin_reply'] = $this->request->post['admin_reply'];
+			} elseif (!empty($review_info)) {
+				$data['admin_reply'] = $review_info['admin_reply'];
+			} else {
+				$data['admin_reply'] = '';
+			}
+			]]></add>
+		</operation>
+	</file>
+	<file path="admin/language/*/catalog/review.php">
+		<operation>
+			<search><![CDATA[// Heading]]>
+			</search>
+			<add position="after"><![CDATA[
+			$_['entry_plus']   		= 'Достоинства:';
+			$_['entry_minus']  		= 'Недостатки:';
+			$_['entry_admin_reply'] = 'Ответ:';
+			]]></add>
+		</operation>
+	</file>
+	<file path="admin/view/template/catalog/review_form.tpl">
+		<operation>
+			<search><![CDATA[<select name="status" id="input-status" class="form-control">]]></search>
+			<add position="before" offset="3"><![CDATA[
+			<div class="form-group required">
+				<label class="col-sm-2 control-label" for="input-plus"><?php echo $entry_plus; ?></label>
+				<div class="col-sm-10">
+					<textarea name="plus" cols="60" rows="8" placeholder="<?php echo $entry_plus; ?>" id="input-text" class="form-control"><?php echo $plus; ?></textarea>
+				</div>
+			</div>
+			<div class="form-group required">
+				<label class="col-sm-2 control-label" for="input-minus"><?php echo $entry_minus; ?></label>
+				<div class="col-sm-10">
+					<textarea name="minus" cols="60" rows="8" placeholder="<?php echo $entry_minus; ?>" id="input-text" class="form-control"><?php echo $minus; ?></textarea>
+				</div>
+			</div>
+			<div class="form-group required">
+				<label class="col-sm-2 control-label" for="input-admin_reply"><?php echo $entry_admin_reply; ?></label>
+				<div class="col-sm-10">
+					<textarea name="admin_reply" cols="60" rows="8" placeholder="<?php echo $entry_admin_reply; ?>" id="input-text" class="form-control"><?php echo $admin_reply; ?></textarea>
+				</div>
+			</div>
+			]]></add>
+		</operation>
+	</file>
+</modification>

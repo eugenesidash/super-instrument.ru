@@ -1,0 +1,93 @@
+.box-category-menu ul{	list-style:none;
+	margin:0;
+	padding:0;}
+.box-category-menu > ul {	display:block;	width:100%;}
+.box-category-menu > ul > li {	position:relative;
+	display:block;
+	width:100%;
+	min-height:40px;
+	background-color:#1E90FF;
+	-webkit-transition: all 0.2s ease;
+	-webkit-transition-property: background-color;
+	-moz-transition: all 0.2s ease;
+	-o-transition: all 0.2s ease;
+	transition: all 0.2s ease;
+}
+.box-category-menu > ul > li+li {	border-top:1px solid #0A59A6;}
+.box-category-menu > ul > li:hover {	background: #ddb600;}
+.box-category-menu > ul li a{
+	display:block;
+	color:#fff;
+	padding:5px 10px;
+	text-decoration:none;
+	white-space: nowrap;
+}
+.box-category-menu > ul li > a img {
+	display:inline-block;
+	vertical-align:middle;
+	max-width:50px;
+	margin-right:5px;
+}
+.box-category-menu > ul li > a span {
+	display:inline-block;
+	vertical-align:middle;
+}
+.box-category-menu > ul > li > div{
+	display:table;
+	visibility:hidden;
+	opacity:0;
+	background: #ddb600;
+	position: absolute;
+	top:0;
+	left:100%;
+	min-width:160px;
+	width:100%;
+	z-index: 125;
+	-webkit-transition: all 0.2s ease;
+	-webkit-transition-property: margin-left, opacity;
+	-moz-transition: all 0.2s ease;
+	-o-transition: all 0.2s ease;
+	transition: all 0.2s ease;
+	margin-left:-10px;
+}
+.box-category-menu > ul > li:hover > div {
+	opacity:1;
+	visibility:visible;
+	margin-left:0;
+}
+.box-category-menu > ul > li ul + ul {
+	display: table-cell;
+}
+.box-category-menu > ul > li > div > ul > li{	position:relative;
+	-webkit-transition: all 0.2s ease;
+	-webkit-transition-property: background-color;
+	-moz-transition: all 0.2s ease;
+	-o-transition: all 0.2s ease;
+	transition: all 0.2s ease;
+}
+.box-category-menu > ul > li > div > ul > li:hover {
+	background: #FF360C;
+}
+.box-category-menu > ul > li > div > ul > li > div{	display:table;
+	visibility:hidden;
+	opacity:0;
+	background: #FF360C;
+	position: absolute;
+	top:0;
+	left:100%;
+	z-index: 125;
+	-webkit-transition: all 0.2s ease;
+	-webkit-transition-property: margin-left, opacity;
+	-moz-transition: all 0.2s ease;
+	-o-transition: all 0.2s ease;
+	transition: all 0.2s ease;
+	margin-left:-10px;
+}
+.box-category-menu > ul > li > div > ul > li:hover > div {
+	opacity:1;
+	visibility:visible;
+	margin-left:0;
+}
+.box-category-menu > ul > li > div > ul > li > div > ul a:hover > span {
+	text-decoration:underline;
+}
